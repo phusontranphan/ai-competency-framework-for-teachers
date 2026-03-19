@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khung Năng Lực AI Cho Giáo Viên (UNESCO) - Bản Tương Tác</title>
+    
+    <!-- Chosen Palette: UNESCO Professional (Navy Blue, Slate, White, Soft Light Blue accents) -->
+    <!-- Application Structure Plan: Cấu trúc SPA được thiết kế để chuyển hóa tài liệu PDF dày đặc thành một hành trình khám phá 4 bước. 1. 'Tổng quan' giới thiệu triết lý cốt lõi bằng biểu đồ phân bổ. 2. 'Khám phá 5 Khía cạnh' sử dụng tab tương tác để chia nhỏ lượng kiến thức lý thuyết, giúp người dùng dễ đọc. 3. 'Ma trận Năng lực' là trọng tâm, chuyển đổi bảng tĩnh thành một lưới tương tác (CSS Grid); người dùng click để xem chi tiết từng cấp độ, tránh quá tải nhận thức (cognitive overload). 4. 'Tự đánh giá' áp dụng kiến thức vào thực tiễn cá nhân thông qua thanh trượt và biểu đồ Radar, biến báo cáo thành một công cụ phản tư (reflection tool). -->
+    <!-- Visualization & Content Choices: 1. Mục tiêu Cấu trúc: Biểu đồ Doughnut (Chart.js) thể hiện 5 khía cạnh bằng nhau, nhấn mạnh AI không chỉ là kỹ thuật. 2. Khía cạnh: Tabs (HTML/JS) để quản lý nội dung chữ. 3. Ma trận: Lưới tương tác (HTML Buttons + JS Panel) cho phép tra cứu đa chiều (Khía cạnh x Cấp độ). 4. Đánh giá: Biểu đồ Radar (Chart.js) so sánh năng lực hiện tại và mục tiêu, có phản hồi tự động bằng JS. KHÔNG SỬ DỤNG SVG hay Mermaid JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 400px; }
+        }
+        .matrix-btn { transition: all 0.2s ease-in-out; }
+        .tab-btn { transition: all 0.2s; }
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-200 selection:text-blue-900">
+
+    <nav class="fixed w-full bg-white/95 backdrop-blur-sm shadow-sm z-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl mr-2">📘</span>
+                    <span class="font-bold text-xl tracking-tight text-blue-950">AI Competency Framework for Teachers</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#tong-quan" class="text-sm font-medium text-slate-600 hover:text-blue-600">Tổng quan</a>
+                    <a href="#khia-canh" class="text-sm font-medium text-slate-600 hover:text-blue-600">5 Khía cạnh</a>
+                    <a href="#ma-tran" class="text-sm font-medium text-slate-600 hover:text-blue-600">Ma trận</a>
+                    <a href="#danh-gia" class="text-sm font-medium text-slate-600 hover:text-blue-600">Tự đánh giá</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-16">
+        <header class="bg-blue-950 text-white py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+            <div class="max-w-4xl mx-auto text-center relative z-10">
+                <span class="inline-block py-1 px-3 rounded-full bg-blue-800 text-blue-200 text-sm font-semibold mb-4 border border-blue-700">Dựa trên Báo cáo của UNESCO</span>
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-6 leading-tight tracking-tight">Khung Năng Lực Trí Tuệ Nhân Tạo <br> Dành Cho Giáo Viên</h1>
+                <p class="text-xl text-blue-100 mb-8 leading-relaxed max-w-2xl mx-auto font-light">Khám phá lộ trình phát triển năng lực AI từ mức độ nhận biết đến sáng tạo, đảm bảo việc ứng dụng công nghệ luôn xoay quanh con người, đạo đức và hiệu quả sư phạm.</p>
+                <a href="#tong-quan" class="inline-flex items-center justify-center bg-blue-500 text-white font-semibold py-3 px-8 rounded-full hover:bg-blue-400 transition shadow-lg hover:shadow-blue-500/30">
+                    Bắt đầu tìm hiểu ⬇️
+                </a>
+            </div>
+        </header>
+
+        <section id="tong-quan" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4 tracking-tight">Cấu trúc cốt lõi của Khung năng lực</h2>
+                <p class="text-slate-600 text-lg max-w-3xl leading-relaxed">Phần này giới thiệu triết lý nền tảng của tài liệu UNESCO. Khung năng lực không chỉ đào tạo kỹ năng sử dụng phần mềm, mà được chia đều thành 5 trụ cột để đảm bảo giáo viên làm chủ AI một cách toàn diện và có trách nhiệm.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                <div class="chart-container">
+                    <canvas id="overviewChart"></canvas>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold mb-4 text-slate-800">Sự cân bằng trong Năng lực Số</h3>
+                    <p class="text-slate-600 mb-6 text-base leading-relaxed">
+                        Mô hình của UNESCO nhấn mạnh rằng việc hiểu "cách dùng" (Nền tảng & Ứng dụng) phải luôn đi kèm với việc hiểu "khi nào dùng" (Sư phạm) và "dùng sao cho đúng" (Đạo đức & Tư duy con người).
+                    </p>
+                    <div class="space-y-4">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <div class="font-semibold text-blue-800 flex items-center mb-1"><span class="mr-2">🌱</span> Mục tiêu Tối thượng</div>
+                            <p class="text-sm text-slate-600">Bảo vệ quyền tự quyết của con người (human agency) và thúc đẩy việc học tập hòa nhập, công bằng trong kỷ nguyên số.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <div class="font-semibold text-blue-800 flex items-center mb-1"><span class="mr-2">📈</span> 3 Cấp độ Phát triển</div>
+                            <p class="text-sm text-slate-600">Khung được thiết kế theo tiến trình: <strong>Nhận biết</strong> (Acquire) -> <strong>Ứng dụng</strong> (Deepen) -> <strong>Sáng tạo</strong> (Create).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="khia-canh" class="py-16 px-4 sm:px-6 lg:px-8 bg-slate-100 border-y border-slate-200">
+            <div class="max-w-7xl mx-auto">
+                <div class="mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4 tracking-tight">Đào sâu 5 Khía cạnh Năng lực</h2>
+                    <p class="text-slate-600 text-lg max-w-3xl leading-relaxed">Tương tác với menu bên trái để hiểu rõ định nghĩa và yêu cầu cốt lõi của từng khía cạnh trong khung năng lực trước khi đối chiếu với các mức độ thành thạo.</p>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="md:w-1/3 flex flex-col space-y-2">
+                        <button class="tab-btn active text-left px-5 py-4 rounded-xl font-medium text-slate-700 bg-white hover:bg-blue-50 border-2 border-transparent focus:outline-none transition data-[active=true]:border-blue-500 data-[active=true]:text-blue-800 data-[active=true]:shadow-sm shadow-sm" data-tab="tab-1" data-active="true">
+                            <span class="mr-2">👤</span> 1. Tư duy lấy Con người làm trung tâm
+                        </button>
+                        <button class="tab-btn text-left px-5 py-4 rounded-xl font-medium text-slate-700 bg-white hover:bg-blue-50 border-2 border-transparent focus:outline-none transition data-[active=true]:border-blue-500 data-[active=true]:text-blue-800 data-[active=true]:shadow-sm shadow-sm" data-tab="tab-2" data-active="false">
+                            <span class="mr-2">⚖️</span> 2. Đạo đức Trí tuệ Nhân tạo
+                        </button>
+                        <button class="tab-btn text-left px-5 py-4 rounded-xl font-medium text-slate-700 bg-white hover:bg-blue-50 border-2 border-transparent focus:outline-none transition data-[active=true]:border-blue-500 data-[active=true]:text-blue-800 data-[active=true]:shadow-sm shadow-sm" data-tab="tab-3" data-active="false">
+                            <span class="mr-2">💻</span> 3. Nền tảng & Ứng dụng AI
+                        </button>
+                        <button class="tab-btn text-left px-5 py-4 rounded-xl font-medium text-slate-700 bg-white hover:bg-blue-50 border-2 border-transparent focus:outline-none transition data-[active=true]:border-blue-500 data-[active=true]:text-blue-800 data-[active=true]:shadow-sm shadow-sm" data-tab="tab-4" data-active="false">
+                            <span class="mr-2">🏫</span> 4. Sư phạm AI
+                        </button>
+                        <button class="tab-btn text-left px-5 py-4 rounded-xl font-medium text-slate-700 bg-white hover:bg-blue-50 border-2 border-transparent focus:outline-none transition data-[active=true]:border-blue-500 data-[active=true]:text-blue-800 data-[active=true]:shadow-sm shadow-sm" data-tab="tab-5" data-active="false">
+                            <span class="mr-2">🚀</span> 5. AI cho Phát triển Nghề nghiệp
+                        </button>
+                    </div>
+
+                    <div class="md:w-2/3 bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                        <div id="tab-1" class="tab-content active">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 text-2xl mb-4">👤</div>
+                            <h3 class="text-2xl font-bold text-slate-900 mb-3">Tư duy lấy Con người làm trung tâm</h3>
+                            <p class="text-slate-600 mb-5 leading-relaxed">Giáo viên cần nhận thức AI là công cụ phục vụ con người, không phải để thay thế sự tương tác và quyết định của nhà giáo dục. Khía cạnh này nhấn mạnh việc bảo vệ quyền tự chủ của giáo viên và học sinh.</p>
+                            <div class="bg-slate-50 rounded-lg p-5 border-l-4 border-blue-500">
+                                <h4 class="font-semibold text-slate-800 mb-2">Trọng tâm:</h4>
+                                <ul class="list-disc pl-5 space-y-1 text-slate-600 text-sm">
+                                    <li>Hiểu biết về tác động của AI đối với quyền con người.</li>
+                                    <li>Đảm bảo con người luôn giữ quyền kiểm soát cuối cùng (Human-in-the-loop).</li>
+                                    <li>Thúc đẩy trách nhiệm giải trình khi sử dụng hệ thống AI.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div id="tab-2" class="tab-content">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 text-2xl mb-4">⚖️</div>
+                            <h3 class="text-2xl font-bold text-slate-900 mb-3">Đạo đức Trí tuệ Nhân tạo</h3>
+                            <p class="text-slate-600 mb-5 leading-relaxed">Đảm bảo việc ứng dụng AI không gây hại, không phân biệt đối xử và tôn trọng quyền riêng tư. Giáo viên phải là rào chắn bảo vệ học sinh khỏi các rủi ro kỹ thuật số.</p>
+                            <div class="bg-slate-50 rounded-lg p-5 border-l-4 border-blue-500">
+                                <h4 class="font-semibold text-slate-800 mb-2">Trọng tâm:</h4>
+                                <ul class="list-disc pl-5 space-y-1 text-slate-600 text-sm">
+                                    <li>Nhận diện và giảm thiểu sự thiên kiến (bias) trong thuật toán.</li>
+                                    <li>Bảo vệ dữ liệu cá nhân của học sinh.</li>
+                                    <li>Đảm bảo tính công bằng và hòa nhập (inclusion) trong truy cập AI.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div id="tab-3" class="tab-content">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 text-2xl mb-4">💻</div>
+                            <h3 class="text-2xl font-bold text-slate-900 mb-3">Nền tảng & Ứng dụng AI</h3>
+                            <p class="text-slate-600 mb-5 leading-relaxed">Khía cạnh kỹ thuật cốt lõi. Yêu cầu giáo viên nắm bắt được cơ chế hoạt động cơ bản của AI, dữ liệu và cách vận hành các công cụ phổ biến (như GenAI).</p>
+                            <div class="bg-slate-50 rounded-lg p-5 border-l-4 border-blue-500">
+                                <h4 class="font-semibold text-slate-800 mb-2">Trọng tâm:</h4>
+                                <ul class="list-disc pl-5 space-y-1 text-slate-600 text-sm">
+                                    <li>Hiểu các khái niệm AI, Machine Learning, thuật toán.</li>
+                                    <li>Kỹ năng thiết kế câu lệnh (Prompt Engineering) hiệu quả.</li>
+                                    <li>Đánh giá độ tin cậy và giới hạn (ảo giác - hallucination) của AI.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div id="tab-4" class="tab-content">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 text-2xl mb-4">🏫</div>
+                            <h3 class="text-2xl font-bold text-slate-900 mb-3">Sư phạm AI</h3>
+                            <p class="text-slate-600 mb-5 leading-relaxed">Tích hợp AI một cách có phương pháp vào quá trình Dạy - Học - Kiểm tra đánh giá. AI phải phục vụ mục tiêu sư phạm, giúp nâng cao chất lượng giáo dục.</p>
+                            <div class="bg-slate-50 rounded-lg p-5 border-l-4 border-blue-500">
+                                <h4 class="font-semibold text-slate-800 mb-2">Trọng tâm:</h4>
+                                <ul class="list-disc pl-5 space-y-1 text-slate-600 text-sm">
+                                    <li>Sử dụng AI để thiết kế bài giảng và tài liệu học tập.</li>
+                                    <li>Hỗ trợ học tập cá nhân hóa và cung cấp phản hồi cho học sinh.</li>
+                                    <li>Đổi mới phương pháp đánh giá (Assessment) trong bối cảnh có AI.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div id="tab-5" class="tab-content">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 text-2xl mb-4">🚀</div>
+                            <h3 class="text-2xl font-bold text-slate-900 mb-3">AI cho Phát triển Nghề nghiệp</h3>
+                            <p class="text-slate-600 mb-5 leading-relaxed">Sử dụng AI như một đối tác trí tuệ để giáo viên tự học, nghiên cứu, mở rộng mạng lưới chuyên môn và nâng cao năng lực bản thân liên tục.</p>
+                            <div class="bg-slate-50 rounded-lg p-5 border-l-4 border-blue-500">
+                                <h4 class="font-semibold text-slate-800 mb-2">Trọng tâm:</h4>
+                                <ul class="list-disc pl-5 space-y-1 text-slate-600 text-sm">
+                                    <li>Tìm kiếm, tổng hợp và phân tích tài liệu nghiên cứu giáo dục.</li>
+                                    <li>Kết nối với cộng đồng thực hành thông qua các nền tảng số.</li>
+                                    <li>Tự phản tư và xây dựng lộ trình phát triển năng lực cá nhân bằng dữ liệu.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="ma-tran" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4 tracking-tight">Ma Trận Năng Lực Chi Tiết</h2>
+                <p class="text-slate-600 text-lg max-w-2xl mx-auto leading-relaxed">Tại đây, 5 khía cạnh giao thoa với 3 mức độ phát triển. <strong>Nhấp vào từng ô trong ma trận</strong> để khám phá các kỹ năng cụ thể và ví dụ hành động mà giáo viên cần đạt được.</p>
+            </div>
+
+            <div class="overflow-x-auto pb-4">
+                <div class="min-w-[900px] border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                    <div class="grid grid-cols-4 bg-slate-50 border-b border-slate-200 divide-x divide-slate-200">
+                        <div class="p-4 flex items-center justify-center font-semibold text-slate-500 uppercase text-xs tracking-wider">Khía Cạnh \ Cấp Độ</div>
+                        <div class="p-4 text-center">
+                            <div class="font-bold text-blue-800">1. Nhận biết (Acquire)</div>
+                            <div class="text-xs text-slate-500 mt-1">Hiểu & Sử dụng cơ bản</div>
+                        </div>
+                        <div class="p-4 text-center">
+                            <div class="font-bold text-blue-800">2. Ứng dụng (Deepen)</div>
+                            <div class="text-xs text-slate-500 mt-1">Tích hợp & Giải quyết v.đề</div>
+                        </div>
+                        <div class="p-4 text-center">
+                            <div class="font-bold text-blue-800">3. Sáng tạo (Create)</div>
+                            <div class="text-xs text-slate-500 mt-1">Đổi mới & Dẫn dắt</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-4 divide-x divide-y divide-slate-200" id="matrix-grid">
+                        <div class="p-4 font-semibold text-slate-800 bg-slate-50 flex items-center">👤 Tư duy lấy Con người làm trung tâm</div>
+                        <button class="matrix-btn p-4 text-left text-sm text-slate-600 hover:bg-blue-50 focus:bg-blue-100 focus:outline-none" data-row="0" data-col="0">Nhận thức tác động của AI đến tự chủ con người.</button>
+                        <button class="matrix-btn p-4 text-left text-sm text-slate-600 hover:bg-blue-50 focus:bg-blue-100 focus:outline-none" data-row="0" data-col="1">Thiết kế môi trường học tập bảo vệ tính tự chủ.</button>
+                        <button class="matrix-btn p-4 text-left text-sm text-slate-600 hover:bg-blue-50 focus:bg-blue-100 focus:outline-none" data-row="0" data-col="2">Phát triển chính sách cấp trường về AI và quyền con người.</button>
+
+                        <div class="p-4 font-semibold text-slate-800 bg-slate-50 flex items-center border-t border-slate-200">⚖️ Đạo đức AI</div>
+                        <button class="matrix-btn p-4 text-left text-sm text-slate-600 hover:bg-blue-50 focus:bg-blue-100 focus:outline-none" data-row="1" data-col="0">Hiểu các rủi ro: thiên kiến, bảo mật, bản quyền.</button>
+                        <button class="matrix-btn p-4 text-left text-sm text-slate-600 hover:bg-blue-50 focus:bg-blue-100 focus:outline-none" data-row="1" data-col="1">Đánh giá và chọn lọc công cụ AI an toàn cho lớp học.</button>
+                        <button class="matrix-btn p-4 text-left text-sm text-slate-600 hover:bg-blue-50 focus:bg-blue-100 focus:outline-none" data-row="1" data-col="2">Dẫn dắt đánh giá đạo đức thuật toán trong nhà trường.</button>
+
+                        <div class="p-4 font-semibold text-slate-800 bg-slate-50 flex items-center">💻 Nền tảng & Ứng dụng</div>
+                        <button class="matrix-btn p-4 text-left text-sm text-slate-600 hover:bg-blue-50 focus:bg-blue-100 focus:outline-none" data-row="2" data-col="0">Biết khái niệm AI, dữ liệu và sử dụng GenAI cơ bản.</button>
+                        <button class="matrix-btn p-4 text-left text-sm text-slate-600 hover:bg-blue-50 focus:bg-blue-100 focus:outline-none" data-row="2" data-col="1">Viết Prompt nâng cao, kết hợp nhiều công cụ AI.</button>
+                        <button class="matrix-btn p-4 text-left text-sm text-slate-600 hover:bg-blue-50 focus:bg-blue-100 focus:outline-none" data-row="2" data-col="2">Xây dựng/Tinh chỉnh mô hình AI nhỏ cho mục đích riêng.</button>
+
+                        <div class="p-4 font-semibold text-slate-800 bg-slate-50 flex items-center">🏫 Sư phạm AI</div>
+                        <button class="matrix-btn p-4 text-left text-sm text-slate-600 hover:bg-blue-50 focus:bg-blue-100 focus:outline-none" data-row="3" data-col="0">Dùng AI trợ giúp soạn giáo án, tạo bài tập đơn giản.</button>
+                        <button class="matrix-btn p-4 text-left text-sm text-slate-600 hover:bg-blue-50 focus:bg-blue-100 focus:outline-none" data-row="3" data-col="1">Thiết kế dự án cho HS dùng AI, cá nhân hóa học tập.</button>
+                        <button class="matrix-btn p-4 text-left text-sm text-slate-600 hover:bg-blue-50 focus:bg-blue-100 focus:outline-none" data-row="3" data-col="2">Sáng tạo phương pháp dạy học/đánh giá hoàn toàn mới.</button>
+
+                        <div class="p-4 font-semibold text-slate-800 bg-slate-50 flex items-center">🚀 Phát triển Nghề nghiệp</div>
+                        <button class="matrix-btn p-4 text-left text-sm text-slate-600 hover:bg-blue-50 focus:bg-blue-100 focus:outline-none" data-row="4" data-col="0">Dùng AI tìm kiếm tài liệu, tham gia khóa học cơ bản.</button>
+                        <button class="matrix-btn p-4 text-left text-sm text-slate-600 hover:bg-blue-50 focus:bg-blue-100 focus:outline-none" data-row="4" data-col="1">Phân tích dữ liệu phản hồi giảng dạy bằng AI.</button>
+                        <button class="matrix-btn p-4 text-left text-sm text-slate-600 hover:bg-blue-50 focus:bg-blue-100 focus:outline-none" data-row="4" data-col="2">Nghiên cứu sư phạm chia sẻ sáng kiến AI với cộng đồng.</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="detail-panel" class="mt-6 bg-blue-900 text-white p-6 rounded-xl shadow-lg hidden relative overflow-hidden">
+                <div class="absolute right-0 top-0 opacity-10 text-9xl transform translate-x-4 -translate-y-4" id="detail-bg-icon">💡</div>
+                <div class="relative z-10">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <span class="bg-blue-800 text-blue-200 text-xs font-bold px-2 py-1 rounded uppercase tracking-wider" id="detail-domain">Khía cạnh</span>
+                        <span class="bg-blue-700 text-white text-xs font-bold px-2 py-1 rounded uppercase tracking-wider" id="detail-level">Cấp độ</span>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3" id="detail-title">Chi tiết kỹ năng</h4>
+                    <p class="text-blue-100 text-sm leading-relaxed mb-4" id="detail-desc">Mô tả chi tiết sẽ xuất hiện ở đây khi bạn nhấp vào ma trận.</p>
+                    <div class="bg-blue-950 p-4 rounded-lg border border-blue-800">
+                        <strong class="text-blue-300 block mb-1 text-sm">Ví dụ minh họa (Hành động):</strong>
+                        <p class="text-white text-sm" id="detail-example">Ví dụ hành động.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="danh-gia" class="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 border-t border-slate-200">
+            <div class="max-w-7xl mx-auto">
+                <div class="mb-12 text-center">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4 tracking-tight">Công cụ Tự Đánh Giá Năng Lực</h2>
+                    <p class="text-slate-600 text-lg max-w-2xl mx-auto leading-relaxed">Áp dụng bộ khung vào bản thân. Kéo thanh trượt để tự chấm điểm từ 1 (Nhận biết) đến 3 (Sáng tạo) cho từng khía cạnh. Biểu đồ Radar sẽ phác họa hồ sơ năng lực hiện tại của bạn.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-6 pb-2 border-b border-slate-100">Chấm điểm cá nhân</h3>
+                        <div class="space-y-6">
+                            <div class="slider-group">
+                                <div class="flex justify-between mb-2">
+                                    <label class="font-medium text-slate-700 text-sm">👤 Tư duy lấy Con người làm trung tâm</label>
+                                    <span class="val-display font-bold text-blue-600 bg-blue-50 px-2 rounded">1.0</span>
+                                </div>
+                                <input type="range" class="skill-slider w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600" data-idx="0" min="1" max="3" step="0.5" value="1">
+                            </div>
+                            <div class="slider-group">
+                                <div class="flex justify-between mb-2">
+                                    <label class="font-medium text-slate-700 text-sm">⚖️ Đạo đức AI</label>
+                                    <span class="val-display font-bold text-blue-600 bg-blue-50 px-2 rounded">1.5</span>
+                                </div>
+                                <input type="range" class="skill-slider w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600" data-idx="1" min="1" max="3" step="0.5" value="1.5">
+                            </div>
+                            <div class="slider-group">
+                                <div class="flex justify-between mb-2">
+                                    <label class="font-medium text-slate-700 text-sm">💻 Nền tảng & Ứng dụng</label>
+                                    <span class="val-display font-bold text-blue-600 bg-blue-50 px-2 rounded">2.0</span>
+                                </div>
+                                <input type="range" class="skill-slider w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600" data-idx="2" min="1" max="3" step="0.5" value="2">
+                            </div>
+                            <div class="slider-group">
+                                <div class="flex justify-between mb-2">
+                                    <label class="font-medium text-slate-700 text-sm">🏫 Sư phạm AI</label>
+                                    <span class="val-display font-bold text-blue-600 bg-blue-50 px-2 rounded">1.0</span>
+                                </div>
+                                <input type="range" class="skill-slider w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600" data-idx="3" min="1" max="3" step="0.5" value="1">
+                            </div>
+                            <div class="slider-group">
+                                <div class="flex justify-between mb-2">
+                                    <label class="font-medium text-slate-700 text-sm">🚀 Phát triển Nghề nghiệp</label>
+                                    <span class="val-display font-bold text-blue-600 bg-blue-50 px-2 rounded">1.0</span>
+                                </div>
+                                <input type="range" class="skill-slider w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600" data-idx="4" min="1" max="3" step="0.5" value="1">
+                            </div>
+                        </div>
+                        <div class="mt-8 p-4 bg-slate-50 rounded-lg border border-slate-200 text-sm text-slate-600">
+                            <strong>Thang điểm:</strong><br>
+                            1.0 - 1.5: Giai đoạn Nhận biết & Khám phá.<br>
+                            2.0 - 2.5: Giai đoạn Ứng dụng & Thực hành.<br>
+                            3.0: Giai đoạn Sáng tạo & Lan tỏa.
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <h3 class="text-xl font-bold text-slate-800 mb-6 pb-2 border-b border-slate-100 text-center">Hồ sơ Năng lực</h3>
+                        <div class="chart-container flex-grow">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                        <div id="radar-feedback" class="mt-6 text-center text-slate-700 font-medium bg-blue-50 p-4 rounded-xl border border-blue-100">
+                            Đang phân tích...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-10 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="text-2xl mb-4">📘</div>
+            <p class="mb-2 font-medium text-slate-300">Công cụ tương tác phân tích Báo cáo UNESCO: AI Competency Framework for Teachers</p>
+            <p class="text-sm text-slate-500 max-w-2xl mx-auto">Thiết kế phục vụ mục đích học tập, tổng hợp và dễ dàng tiếp cận kiến thức từ tài liệu gốc. Ứng dụng thiết kế theo dạng SPA tối ưu trải nghiệm người dùng.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const overviewCtx = document.getElementById('overviewChart').getContext('2d');
+            new Chart(overviewCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Tư duy Con người', 'Đạo đức AI', 'Nền tảng Ứng dụng', 'Sư phạm AI', 'Phát triển Nghề nghiệp'],
+                    datasets: [{
+                        data: [20, 20, 20, 20, 20],
+                        backgroundColor: ['#1e3a8a', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: 'Inter' }, padding: 20 } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) { return ' ' + context.label + ': Trọng tâm cân bằng'; }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.setAttribute('data-active', 'false'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    tab.setAttribute('data-active', 'true');
+                    document.getElementById(tab.getAttribute('data-tab')).classList.add('active');
+                });
+            });
+
+            const matrixContent = [
+                [
+                    { title: "Nhận thức Tác động", desc: "Giáo viên hiểu được AI tác động thế nào đến quyền con người và sự phát triển tự chủ của học sinh. Nhận biết giới hạn của hệ thống.", example: "Thảo luận trên lớp về việc tại sao không nên tin 100% vào câu trả lời của ChatGPT." },
+                    { title: "Bảo vệ Tự chủ", desc: "Thiết kế các hoạt động học tập đòi hỏi sự can thiệp và suy nghĩ phản biện của con người, không để AI làm thay toàn bộ quá trình.", example: "Yêu cầu học sinh tạo dàn ý bằng AI, nhưng phải tự tay viết và phản biện lại dàn ý đó." },
+                    { title: "Dẫn dắt Văn hóa", desc: "Khởi xướng và xây dựng các chính sách cấp cơ sở để đảm bảo môi trường học đường luôn đặt con người làm trung tâm trong kỷ nguyên số.", example: "Tổ chức hội thảo cho phụ huynh và học sinh về 'Quyền công dân số và AI'." }
+                ],
+                [
+                    { title: "Nhận diện Rủi ro Đạo đức", desc: "Hiểu và phát hiện được các vấn đề như định kiến giới tính/sắc tộc trong thuật toán, rủi ro lộ dữ liệu học sinh.", example: "Chỉ ra một bức ảnh do AI tạo ra có chứa định kiến về nghề nghiệp." },
+                    { title: "Lựa chọn An toàn", desc: "Có khả năng thiết lập quy tắc sử dụng và chọn lọc các công cụ AI tuân thủ luật bảo vệ dữ liệu giáo dục.", example: "Từ chối dùng một công cụ AI yêu cầu học sinh cung cấp quá nhiều thông tin cá nhân." },
+                    { title: "Kiểm toán Đạo đức", desc: "Xây dựng các bộ tiêu chí (rubric) để đánh giá toàn diện các phần mềm AI trước khi nhà trường quyết định mua hoặc sử dụng.", example: "Lập ban tư vấn đạo đức AI cấp trường." }
+                ],
+                [
+                    { title: "Kiến thức Nền tảng", desc: "Biết khái niệm cơ bản về AI tạo sinh, mô hình ngôn ngữ lớn (LLM). Biết cách đăng nhập và viết prompt cơ bản.", example: "Sử dụng ChatGPT để dịch một đoạn văn bản hoặc tóm tắt một bài báo." },
+                    { title: "Prompt Nâng cao", desc: "Thành thạo kỹ thuật Prompt Engineering, phân vai, tạo ngữ cảnh. Biết kết hợp text-to-text và text-to-image.", example: "Tạo một prompt phức tạp yêu cầu AI đóng vai một nhà khoa học để giải thích hiện tượng vật lý cho học sinh lớp 6." },
+                    { title: "Thiết kế Hệ thống Nhỏ", desc: "Khả năng huấn luyện (fine-tune) các mô hình AI nhỏ hoặc tạo các Custom GPT phục vụ riêng cho môn học của mình.", example: "Xây dựng một Chatbot học tập chỉ sử dụng dữ liệu từ sách giáo khoa của trường." }
+                ],
+                [
+                    { title: "Trợ lý Hành chính", desc: "Sử dụng AI để giảm tải công việc thường ngày như viết email, tạo danh sách từ vựng, lên dàn ý bài học.", example: "Dùng AI tạo 10 câu hỏi trắc nghiệm kiểm tra bài cũ." },
+                    { title: "Tích hợp Sư phạm", desc: "Sử dụng AI trong giờ học để tạo ra các phương pháp tiếp cận phân hóa, hỗ trợ học sinh có năng lực khác nhau.", example: "Dùng công cụ AI phân tích bài văn của học sinh và đưa ra gợi ý sửa lỗi cá nhân hóa." },
+                    { title: "Đổi mới Đánh giá", desc: "Thiết kế lại hoàn toàn cách kiểm tra đánh giá, chuyển từ kiểm tra trí nhớ sang đánh giá tư duy phản biện với AI.", example: "Bài thi yêu cầu học sinh cùng AI giải quyết một vấn đề xã hội thực tế." }
+                ],
+                [
+                    { title: "Công cụ Tự học", desc: "Dùng AI để tìm kiếm thông tin nhanh chóng, tóm tắt các tài liệu chuyên môn dài.", example: "Yêu cầu AI tóm tắt các điểm chính trong một báo cáo giáo dục mới." },
+                    { title: "Phân tích Phản hồi", desc: "Sử dụng các công cụ phân tích dữ liệu AI để hiểu rõ hơn về hiệu quả giảng dạy của bản thân qua kết quả của học sinh.", example: "Đưa dữ liệu điểm số và phản hồi của học sinh vào AI để tìm ra lỗ hổng trong phương pháp dạy." },
+                    { title: "Lan tỏa Cộng đồng", desc: "Tiến hành nghiên cứu, tổng kết kinh nghiệm sử dụng AI và chia sẻ trong các hội thảo giáo dục chuyên nghiệp.", example: "Viết báo cáo chuyên đề về 'Sử dụng AI tạo sinh trong môn Lịch sử' đăng trên tạp chí giáo dục." }
+                ]
+            ];
+
+            const domainNames = ['👤 Tư duy lấy Con người làm TT', '⚖️ Đạo đức AI', '💻 Nền tảng & Ứng dụng', '🏫 Sư phạm AI', '🚀 Phát triển Nghề nghiệp'];
+            const levelNames = ['Cấp độ 1: Nhận biết', 'Cấp độ 2: Ứng dụng', 'Cấp độ 3: Sáng tạo'];
+            const icons = ['👤', '⚖️', '💻', '🏫', '🚀'];
+
+            const matrixBtns = document.querySelectorAll('.matrix-btn');
+            const panel = document.getElementById('detail-panel');
+            const pDomain = document.getElementById('detail-domain');
+            const pLevel = document.getElementById('detail-level');
+            const pTitle = document.getElementById('detail-title');
+            const pDesc = document.getElementById('detail-desc');
+            const pExample = document.getElementById('detail-example');
+            const pIconBg = document.getElementById('detail-bg-icon');
+
+            matrixBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    matrixBtns.forEach(b => b.classList.remove('bg-blue-100', 'ring-inset', 'ring-2', 'ring-blue-500'));
+                    e.target.classList.add('bg-blue-100', 'ring-inset', 'ring-2', 'ring-blue-500');
+
+                    const r = parseInt(e.target.getAttribute('data-row'));
+                    const c = parseInt(e.target.getAttribute('data-col'));
+                    
+                    const data = matrixContent[r][c];
+                    
+                    pDomain.textContent = domainNames[r];
+                    pLevel.textContent = levelNames[c];
+                    pTitle.textContent = data.title;
+                    pDesc.textContent = data.desc;
+                    pExample.textContent = data.example;
+                    pIconBg.textContent = icons[r];
+
+                    panel.classList.remove('hidden');
+                });
+            });
+
+            const radarCtx = document.getElementById('radarChart').getContext('2d');
+            let radarChart = new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Tư duy Con người', 'Đạo đức', 'Nền tảng', 'Sư phạm', 'PT Nghề nghiệp'],
+                    datasets: [
+                        {
+                            label: 'Mục tiêu Kì vọng',
+                            data: [3, 3, 3, 3, 3],
+                            backgroundColor: 'rgba(203, 213, 225, 0.2)',
+                            borderColor: 'rgba(148, 163, 184, 0.5)',
+                            borderDash: [5, 5],
+                            borderWidth: 2,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Năng lực Hiện tại',
+                            data: [1, 1.5, 2, 1, 1],
+                            backgroundColor: 'rgba(37, 99, 235, 0.4)',
+                            borderColor: 'rgba(37, 99, 235, 1)',
+                            pointBackgroundColor: 'rgba(30, 58, 138, 1)',
+                            borderWidth: 2,
+                            pointRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0, max: 3,
+                            ticks: {
+                                stepSize: 1,
+                                font: { family: 'Inter' },
+                                callback: function(val) {
+                                    if(val===1) return 'Nhận biết';
+                                    if(val===2) return 'Ứng dụng';
+                                    if(val===3) return 'Sáng tạo';
+                                    return '';
+                                }
+                            },
+                            pointLabels: { font: { family: 'Inter', size: 11, weight: '600' }, color: '#334155' }
+                        }
+                    },
+                    plugins: { legend: { position: 'bottom', labels: { font: { family: 'Inter' } } } }
+                }
+            });
+
+            const sliders = document.querySelectorAll('.skill-slider');
+            const displays = document.querySelectorAll('.val-display');
+            const feedbackBox = document.getElementById('radar-feedback');
+
+            function updateRadar() {
+                let vals = [];
+                let total = 0;
+                sliders.forEach((slider, index) => {
+                    let v = parseFloat(slider.value);
+                    vals.push(v);
+                    total += v;
+                    displays[index].textContent = v.toFixed(1);
+                });
+
+                radarChart.data.datasets[1].data = vals;
+                radarChart.update();
+
+                let avg = total / 5;
+                if (avg < 1.5) {
+                    feedbackBox.innerHTML = "Bạn đang ở <strong>Giai đoạn Làm quen</strong>. Hãy bắt đầu bằng việc tìm hiểu cách viết Prompt và các rủi ro bảo mật cơ bản.";
+                } else if (avg < 2.5) {
+                    feedbackBox.innerHTML = "Bạn đang ở <strong>Giai đoạn Ứng dụng</strong>. Hãy tự tin đưa AI vào soạn giáo án và thử nghiệm một vài hoạt động trên lớp.";
+                } else {
+                    feedbackBox.innerHTML = "Tuyệt vời! Bạn đang ở mức <strong>Sáng tạo & Dẫn dắt</strong>. Hãy chia sẻ kinh nghiệm để truyền cảm hứng cho đồng nghiệp.";
+                }
+            }
+
+            sliders.forEach(slider => {
+                slider.addEventListener('input', updateRadar);
+            });
+            
+            updateRadar();
+        });
+    </script>
+</body>
+</html>
